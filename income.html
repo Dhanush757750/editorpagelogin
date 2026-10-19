@@ -1,0 +1,573 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monthly Income Tracker</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    padding: 25px 15px;
+    color: #292743;
+    background: linear-gradient(-45deg, #667eea, #764ba2, #8e7be8, #5f72bd);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Added: Live date and time in the top-right corner */
+.datetime-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 220px;
+    padding: 13px 17px;
+    color: white;
+    text-align: right;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.datetime-day {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.datetime-date {
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.datetime-time {
+    margin-top: 7px;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.page {
+    max-width: 920px;
+    margin: auto;
+    animation: appear .6s ease;
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.panel {
+    padding: 26px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 18px 45px #2c1d5540;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+h1 {
+    font-size: 30px;
+    margin-bottom: 7px;
+}
+
+.subtitle {
+    color: #7b8193;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.btn {
+    border: none;
+    border-radius: 11px;
+    padding: 11px 17px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 5px 13px #667eea45;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 9px 20px #667eea65;
+}
+
+.btn:active {
+    transform: scale(.96);
+}
+
+.month-picker {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+input[type="month"] {
+    padding: 11px;
+    border: 1px solid #dfe2f0;
+    border-radius: 10px;
+    font: inherit;
+    background: #fafaff;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.stat {
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f4f2ff, #faf8ff);
+    border: 1px solid #eee9ff;
+}
+
+.stat span {
+    display: block;
+    color: #7b8193;
+    font-size: 12px;
+    margin-bottom: 9px;
+}
+
+.stat strong {
+    font-size: 23px;
+    color: #654fc0;
+}
+
+.progress {
+    height: 9px;
+    margin-top: 10px;
+    background: #eeedf7;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress div {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 20px;
+    transition: width .35s;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 24px 0 13px;
+}
+
+.section-title h2 {
+    font-size: 19px;
+}
+
+.section-title small {
+    color: #7b8193;
+}
+
+.days {
+    display: grid;
+    gap: 10px;
+}
+
+.day-row {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    border: 1px solid #ececf5;
+    border-radius: 13px;
+    transition: .2s;
+    animation: rowIn .3s ease both;
+}
+
+.day-row:hover {
+    border-color: #bcb0f0;
+    background: #fcfbff;
+    transform: translateX(2px);
+}
+
+@keyframes rowIn {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.day-date strong {
+    display: block;
+    font-size: 14px;
+}
+
+.day-date small {
+    display: block;
+    color: #7b8193;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.income-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 9px;
+    font-size: 12px;
+    color: #5d5683;
+    background: #f7f6ff;
+    border: 1px solid #e8e3ff;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.income-check:hover {
+    transform: translateY(-2px);
+    border-color: #b8a9f2;
+}
+
+.income-check input {
+    width: 16px;
+    height: 16px;
+    accent-color: #7655c7;
+    cursor: pointer;
+}
+
+.day-total {
+    color: #29966a;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.note {
+    color: #7b8193;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 17px;
+}
+
+.actions {
+    margin-top: 18px;
+}
+
+footer {
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    margin-top: 16px;
+}
+
+@media (max-width: 620px) {
+    body { padding: 12px 8px; }
+
+    /* Added: Responsive date and time panel */
+    .datetime-box {
+        top: 10px;
+        right: 10px;
+        min-width: 175px;
+        padding: 9px 12px;
+    }
+
+    .datetime-day { font-size: 11px; }
+    .datetime-date { font-size: 10px; }
+    .datetime-time { font-size: 17px; }
+
+    .page { margin-top: 105px; }
+    .panel { padding: 16px; }
+    .summary { grid-template-columns: 1fr; }
+    .day-row { grid-template-columns: 1fr; gap: 10px; }
+    .day-date { display: flex; align-items: baseline; gap: 8px; }
+    .day-total { text-align: right; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Added: Live date and time display -->
+<div class="datetime-box">
+    <div class="datetime-day" id="liveDay"></div>
+    <div class="datetime-date" id="liveDate"></div>
+    <div class="datetime-time" id="liveTime"></div>
+</div>
+
+<main class="page">
+<section class="panel">
+
+    <div class="top">
+        <div>
+            <h1>Monthly Income</h1>
+            <p class="subtitle">
+                Track your daily earnings by ticking a box for every ₹200 earned.
+            </p>
+        </div>
+        <button class="btn" id="backButton">← Back</button>
+    </div>
+
+    <div class="month-picker">
+        <label for="incomeMonth"><strong>Select month</strong></label>
+        <input type="month" id="incomeMonth">
+        <button class="btn" id="clearMonth">Clear this month</button>
+    </div>
+
+    <div class="summary">
+        <div class="stat">
+            <span>Earned this month</span>
+            <strong id="monthlyTotal">₹0</strong>
+            <div class="progress">
+                <div id="incomeProgress"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <span>Potential income</span>
+            <strong id="potentialTotal">₹0</strong>
+        </div>
+
+        <div class="stat">
+            <span>Monthly target</span>
+            <strong>₹20,000</strong>
+            <div class="progress">
+                <div id="targetProgress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <h2>Daily earnings checklist</h2>
+        <small>₹200 per tick · 4 ticks per day</small>
+    </div>
+
+    <div id="dailyIncomeChecklist" class="days"></div>
+
+    <p class="note">
+        Your checked boxes are saved automatically in this browser.
+        Each checked box adds ₹200 to your daily and monthly earnings.
+    </p>
+
+    <div class="actions">
+        <button class="btn" id="todayButton">Go to current month</button>
+    </div>
+
+</section>
+
+<footer>Student Portal · Stay organized and keep learning.</footer>
+</main>
+
+<script>
+const RATE = 200;
+const BOXES_PER_DAY = 4;
+const TARGET = 20000;
+
+const monthInput = document.getElementById("incomeMonth");
+const checklist = document.getElementById("dailyIncomeChecklist");
+
+function getStorageKey(month) {
+    return "monthlyIncomeChecks_" + month;
+}
+
+function readChecks(month) {
+    try {
+        return JSON.parse(
+            localStorage.getItem(getStorageKey(month)) || "{}"
+        );
+    } catch {
+        return {};
+    }
+}
+
+function saveChecks(month, data) {
+    localStorage.setItem(getStorageKey(month), JSON.stringify(data));
+}
+
+function money(amount) {
+    return "₹" + amount.toLocaleString("en-IN");
+}
+
+function render() {
+    const month = monthInput.value;
+    if (!month) return;
+
+    const [year, monthNumber] = month.split("-").map(Number);
+    const daysInMonth = new Date(year, monthNumber, 0).getDate();
+    const data = readChecks(month);
+
+    checklist.innerHTML = "";
+    let checkedCount = 0;
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, monthNumber - 1, day);
+
+        const row = document.createElement("div");
+        row.className = "day-row";
+        row.style.animationDelay = Math.min(day * 8, 180) + "ms";
+
+        const dateBox = document.createElement("div");
+        dateBox.className = "day-date";
+
+        const dayName = document.createElement("strong");
+        dayName.textContent = date.toLocaleDateString("en-IN", {
+            weekday: "short"
+        });
+
+        const dateText = document.createElement("small");
+        dateText.textContent = date.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short"
+        });
+
+        dateBox.append(dayName, dateText);
+
+        const checks = document.createElement("div");
+        checks.className = "checks";
+
+        for (let i = 0; i < BOXES_PER_DAY; i++) {
+            const label = document.createElement("label");
+            label.className = "income-check";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = Boolean(data[day] && data[day][i]);
+
+            const amount = document.createElement("span");
+            amount.textContent = money(RATE);
+
+            checkbox.addEventListener("change", () => {
+                const updated = readChecks(month);
+
+                if (!updated[day]) {
+                    updated[day] = [false, false, false, false];
+                }
+
+                updated[day][i] = checkbox.checked;
+                saveChecks(month, updated);
+                render();
+            });
+
+            label.append(checkbox, amount);
+            checks.appendChild(label);
+        }
+
+        const dayTotal = document.createElement("div");
+        dayTotal.className = "day-total";
+
+        const completed = (data[day] || []).filter(Boolean).length;
+        checkedCount += completed;
+        dayTotal.textContent = money(completed * RATE);
+
+        row.append(dateBox, checks, dayTotal);
+        checklist.appendChild(row);
+    }
+
+    const earned = checkedCount * RATE;
+    const potential = daysInMonth * BOXES_PER_DAY * RATE;
+
+    document.getElementById("monthlyTotal").textContent = money(earned);
+    document.getElementById("potentialTotal").textContent = money(potential);
+
+    document.getElementById("incomeProgress").style.width =
+        Math.min(100, earned / potential * 100) + "%";
+
+    document.getElementById("targetProgress").style.width =
+        Math.min(100, earned / TARGET * 100) + "%";
+}
+
+function currentMonth() {
+    const now = new Date();
+    monthInput.value =
+        now.getFullYear() + "-" +
+        String(now.getMonth() + 1).padStart(2, "0");
+    render();
+}
+
+monthInput.addEventListener("change", render);
+
+document.getElementById("clearMonth").addEventListener("click", () => {
+    if (confirm("Clear all checked boxes for " + monthInput.value + "?")) {
+        localStorage.removeItem(getStorageKey(monthInput.value));
+        render();
+    }
+});
+
+document.getElementById("todayButton").addEventListener("click", currentMonth);
+
+document.getElementById("backButton").addEventListener("click", () => {
+    if (document.referrer &&
+        new URL(document.referrer).origin === location.origin) {
+        history.back();
+    } else {
+        location.href = "dashboard_mobile_same_laptop_view.html";
+    }
+});
+
+/* Added: Update live date and time every second */
+function updateDateTime() {
+    const now = new Date();
+
+    document.getElementById("liveDay").textContent =
+        now.toLocaleDateString("en-IN", {
+            weekday: "long"
+        });
+
+    document.getElementById("liveDate").textContent =
+        now.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        });
+
+    document.getElementById("liveTime").textContent =
+        now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        });
+}
+
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+currentMonth();
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Portal Menu</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg, #667eea, #764ba2);
+    padding: 20px;
+}
+
+/* Live date and time in the top-right corner */
+.datetime-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 210px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.17);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    text-align: right;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.datetime-day {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.datetime-date {
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.datetime-time {
+    margin-top: 6px;
+    font-size: 21px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.menu-card {
+    width: 350px;
+    max-width: 100%;
+    background: white;
+    border-radius: 17px;
+    overflow: hidden;
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22);
+}
+
+.menu-header {
+    background: #4f46e5;
+    color: white;
+    text-align: center;
+    padding: 22px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 69px;
+    padding: 14px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item:hover {
+    background: #f1f0ff;
+    padding-left: 27px;
+}
+
+.menu-icon {
+    width: 37px;
+    height: 37px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #5146ed;
+    color: white;
+    font-size: 18px;
+}
+
+.page {
+    display: none;
+    width: 500px;
+    max-width: 100%;
+    background: white;
+    padding: 30px;
+    border-radius: 17px;
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22);
+}
+
+.page h1 {
+    color: #4f46e5;
+    margin-bottom: 20px;
+}
+
+.page p {
+    color: #444;
+    line-height: 1.8;
+    margin-bottom: 10px;
+}
+
+.page input {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    max-width: 100%;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 18px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.back-button:hover {
+    background: #3730a3;
+}
+
+@media (max-width: 520px) {
+    body {
+        padding: 15px;
+        padding-top: 125px;
+    }
+
+    .datetime-box {
+        top: 12px;
+        right: 12px;
+        min-width: 190px;
+        padding: 9px 12px;
+    }
+
+    .datetime-time {
+        font-size: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LIVE DATE AND TIME -->
+<div class="datetime-box">
+    <div class="datetime-day" id="liveDay">Loading day...</div>
+    <div class="datetime-date" id="liveDate">Loading date...</div>
+    <div class="datetime-time" id="liveTime">Loading time...</div>
+</div>
+
+<!-- MENU -->
+<div class="menu-card" id="menu">
+    <div class="menu-header">Menu</div>
+
+    <a href="home.html" class="menu-item" onclick="showPage('home')">
+        <span class="menu-icon">🏠</span>
+        <span>Home</span>
+    </a>
+
+    <a href="income.html" class="menu-item" onclick="showPage('profile')">
+        <span class="menu-icon">👤</span>
+        <span>Income</span>
+    </a>
+
+    <a href="task.html" class="menu-item" onclick="showPage('notification')">
+        <span class="menu-icon">⚠️</span>
+        <span>Tasks</span>
+    </a>
+
+    <a href="calender.html" class="menu-item" onclick="showPage('calendar')">
+        <span class="menu-icon">▦</span>
+        <span>Activity Calendar</span>
+    </a>
+
+    <a href="1index.html" class="menu-item" onclick="showPage('logout')">
+        <span class="menu-icon">⇥</span>
+        <span>Logout</span>
+    </a>
+</div>
+
+<!-- HOME PAGE -->
+<div class="page" id="home">
+    <h1>🏠 Home</h1>
+    <p>Welcome to your Student Portal!</p>
+    <p>This is your home page.</p>
+    <button class="back-button" onclick="goBack()">← Back to Menu</button>
+</div>
+
+<!-- PROFILE PAGE -->
+<div class="page" id="profile">
+    <h1>👤 Profile</h1>
+    <p><strong>Student Name:</strong> Your Name</p>
+    <p><strong>Student ID:</strong> Your ID</p>
+    <p><strong>Department:</strong> Computer Science</p>
+    <p><strong>Email:</strong> student@example.com</p>
+    <button class="back-button" onclick="goBack()">← Back to Menu</button>
+</div>
+
+<!-- NOTIFICATION PAGE -->
+<div class="page" id="notification">
+    <h1>⚠️ Notifications</h1>
+    <p>You have no new notifications.</p>
+    <button class="back-button" onclick="goBack()">← Back to Menu</button>
+</div>
+
+<!-- ACTIVITY CALENDAR PAGE -->
+<div class="page" id="calendar">
+    <h1>▦ Activity Calendar</h1>
+    <p>Select a date for your activity.</p>
+    <input type="date" id="activityDate">
+    <p id="selectedDate"></p>
+    <button class="back-button" onclick="goBack()">← Back to Menu</button>
+</div>
+
+<!-- LOGOUT PAGE -->
+<div class="page" id="logout">
+    <h1>Logged Out</h1>
+    <p>You have returned to the logout screen.</p>
+    <button class="back-button" onclick="goBack()">Return to Menu</button>
+</div>
+
+<script>
+/* Update date and time every second */
+function updateDateTime() {
+    const now = new Date();
+
+    document.getElementById("liveDay").textContent =
+        now.toLocaleDateString("en-IN", {
+            weekday: "long"
+        });
+
+    document.getElementById("liveDate").textContent =
+        now.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        });
+
+    document.getElementById("liveTime").textContent =
+        now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        });
+}
+
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+function showPage(pageId) {
+    document.getElementById("menu").style.display = "none";
+
+    document.querySelectorAll(".page").forEach(function(page) {
+        page.style.display = "none";
+    });
+
+    document.getElementById(pageId).style.display = "block";
+}
+
+function goBack() {
+    document.querySelectorAll(".page").forEach(function(page) {
+        page.style.display = "none";
+    });
+
+    document.getElementById("menu").style.display = "block";
+}
+
+document.getElementById("activityDate").addEventListener("change", function() {
+    document.getElementById("selectedDate").textContent =
+        this.value ? "Selected date: " + this.value : "";
+});
+</script>
+
+</body>
+</html>

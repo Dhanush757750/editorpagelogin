@@ -1,0 +1,1220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Calendar 2026-2027</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 25px 15px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #29213f;
+    background: linear-gradient(-45deg, #667eea, #764ba2, #a18cd1, #fbc2eb);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animated live date and time panel */
+.datetime-box {
+    position: fixed;
+    top: 27px;
+    right: 27px;
+    z-index: 1000;
+    min-width: 210px;
+    padding: 12px 16px;
+    text-align: right;
+    color: #ffffff;
+    background: rgba(153, 128, 205, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 13px;
+    box-shadow: 0 8px 22px rgba(54, 28, 95, 0.2);
+    backdrop-filter: blur(10px);
+    animation: clockEnter 0.8s ease-out,
+               clockGlow 3s ease-in-out 0.8s infinite;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.datetime-box:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 28px rgba(54, 28, 95, 0.3);
+}
+
+.datetime-day {
+    font-size: 14px;
+    font-weight: 700;
+    animation: fadeSlide 0.7s ease-out;
+}
+
+.datetime-date {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+    animation: fadeSlide 0.9s ease-out;
+}
+
+.datetime-time {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-top: 5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    animation: timePulse 2s ease-in-out infinite;
+}
+
+@keyframes clockEnter {
+    from {
+        opacity: 0;
+        transform: translateX(35px) scale(0.94);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes clockGlow {
+    0%, 100% {
+        box-shadow: 0 8px 22px rgba(54, 28, 95, 0.2);
+    }
+    50% {
+        box-shadow: 0 8px 28px rgba(255, 255, 255, 0.2);
+    }
+}
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes timePulse {
+    0%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+    50% {
+        opacity: 0.88;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    }
+}
+
+.app {
+    max-width: 1200px;
+    margin: auto;
+    animation: appear .6s ease;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: white;
+    margin-bottom: 22px;
+}
+
+header h1 {
+    margin: 0 0 7px;
+    font-size: clamp(24px, 4vw, 36px);
+}
+
+header p {
+    margin: 0;
+    color: #f2eaff;
+}
+
+button, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 600;
+    transition: .2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px #31136c25;
+}
+
+.top-button {
+    color: #fff;
+    background: #ffffff25;
+    border: 1px solid #ffffff80;
+}
+
+.card {
+    background: #ffffffed;
+    border: 1px solid #ffffffa8;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 12px 35px #32166d20;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.stat-label {
+    color: #77718e;
+    font-size: 14px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 25px;
+    font-weight: 800;
+    margin-top: 7px;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, .85fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.calendar-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.calendar-heading h2, .card h2 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.month-controls {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.month-controls button {
+    color: #5434a1;
+    background: #eee9ff;
+    font-size: 20px;
+    padding: 6px 13px;
+}
+
+select {
+    padding: 9px;
+    border-radius: 9px;
+    border: 1px solid #e4dcf7;
+    background: white;
+    color: #29213f;
+    max-width: 160px;
+}
+
+.weekdays, .days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.weekdays div {
+    text-align: center;
+    color: #77718e;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 8px 0;
+}
+
+.day {
+    min-width: 0;
+    min-height: 83px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+    text-align: left;
+    padding: 7px;
+    border: 1px solid #eee8fa;
+    background: white;
+    color: #29213f;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.day:hover {
+    background: #faf7ff;
+    border-color: #a28be9;
+}
+
+.day.empty {
+    background: transparent;
+    border-color: transparent;
+    pointer-events: none;
+}
+
+.day.today {
+    outline: 2px solid #7147d7;
+    outline-offset: -2px;
+}
+
+.day.selected {
+    background: #eee8ff;
+    border-color: #7147d7;
+}
+
+.day-number {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.event-marker {
+    background: #eee8ff;
+    color: #5531a1;
+    border-radius: 5px;
+    padding: 3px;
+    font-size: 10px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.star {
+    color: #a344cf;
+    font-weight: bold;
+}
+
+.side {
+    display: grid;
+    gap: 16px;
+}
+
+.selected-date {
+    margin: 10px 0 14px;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.event-list {
+    display: grid;
+    gap: 10px;
+}
+
+.event-item {
+    background: white;
+    border: 1px solid #ece5f8;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.event-item h3 {
+    margin: 0 0 7px;
+    font-size: 15px;
+}
+
+.event-item p {
+    color: #77718e;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.event-date {
+    display: inline-block;
+    background: #f0eaff;
+    color: #5531a1;
+    padding: 5px 8px;
+    border-radius: 15px;
+    font-size: 11px;
+    margin-top: 9px;
+}
+
+.pin-button {
+    margin-top: 10px;
+    background: #f4eaff;
+    color: #7835a6;
+    padding: 7px 10px;
+    font-size: 12px;
+}
+
+.pinned-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.pinned-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #ece5f8;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 13px;
+}
+
+.pinned-item button {
+    background: #eee8ff;
+    color: #5531a1;
+    padding: 6px 9px;
+    font-size: 12px;
+}
+
+.empty-note {
+    color: #77718e;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 12px;
+}
+
+.legend {
+    margin-top: 13px;
+    color: #77718e;
+    font-size: 12px;
+}
+
+footer {
+    text-align: center;
+    color: white;
+    margin-top: 18px;
+    font-size: 12px;
+}
+
+@media (max-width: 850px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        padding-top: 80px;
+    }
+}
+
+@media (max-width: 520px) {
+    body {
+        padding: 15px 7px;
+    }
+
+    .card {
+        padding: 10px;
+    }
+
+    .weekdays, .days {
+        gap: 3px;
+    }
+
+    .day {
+        min-height: 60px;
+        padding: 4px 3px;
+        border-radius: 7px;
+    }
+
+    .event-marker {
+        font-size: 9px;
+        padding: 2px;
+    }
+
+    .weekdays div {
+        font-size: 10px;
+    }
+
+    .datetime-box {
+        top: 8px;
+        right: 8px;
+        min-width: 150px;
+        padding: 7px 10px;
+        border-radius: 10px;
+    }
+
+    .datetime-day,
+    .datetime-date {
+        font-size: 10px;
+    }
+
+    .datetime-time {
+        font-size: 15px;
+        letter-spacing: 0.5px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .datetime-box,
+    .datetime-day,
+    .datetime-date,
+    .datetime-time,
+    body,
+    .app {
+        animation: none;
+        transition: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Animated live date and time -->
+<div class="datetime-box">
+    <div class="datetime-day" id="liveDay"></div>
+    <div class="datetime-date" id="liveDate"></div>
+    <div class="datetime-time" id="liveTime"></div>
+</div>
+
+<div class="app">
+
+<header>
+    <div>
+        <h1>Activity Calendar 2026–2027</h1>
+        <p>Odd Semester · 3rd, 5th and 7th Semester · UG</p>
+    </div>
+
+    <div>
+        <button class="top-button" id="todayBtn">Go to Today</button>
+        <button class="top-button" id="backBtn">← Back</button>
+    </div>
+</header>
+
+<section class="stats">
+    <div class="card">
+        <span class="stat-label">Events in Selected Month</span>
+        <strong class="stat-number" id="monthCount">0</strong>
+    </div>
+
+    <div class="card">
+        <span class="stat-label">Pinned Events</span>
+        <strong class="stat-number" id="pinCount">0</strong>
+    </div>
+
+    <div class="card">
+        <span class="stat-label">Next Scheduled Event</span>
+        <strong class="stat-number" style="font-size:16px" id="nextEvent">—</strong>
+        <span class="stat-label" id="nextDate"></span>
+    </div>
+</section>
+
+<div class="layout">
+    <section class="card">
+        <div class="calendar-heading">
+            <h2 id="monthTitle">Calendar</h2>
+
+            <div class="month-controls">
+                <button id="prevBtn" aria-label="Previous month">‹</button>
+                <select id="monthSelect"></select>
+                <button id="nextBtn" aria-label="Next month">›</button>
+            </div>
+        </div>
+
+        <div class="weekdays">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+        </div>
+
+        <div class="days" id="daysGrid"></div>
+
+        <div class="legend">
+            ★ = Pinned event · Outlined date = Today
+        </div>
+    </section>
+
+    <aside class="side">
+        <section class="card">
+            <h2>Selected Date</h2>
+            <div class="selected-date" id="selectedDate"></div>
+            <div class="event-list" id="eventList"></div>
+        </section>
+
+        <section class="card">
+            <h2>★ Pinned Events</h2>
+            <div class="pinned-list" id="pinnedList"></div>
+        </section>
+    </aside>
+</div>
+
+<footer>
+    Activity Calendar 2026–2027 · Events based on the uploaded college calendar
+</footer>
+
+</div>
+
+<script>
+const events = [
+    {
+        id: "enrol1",
+        start: "2026-06-15",
+        end: "2026-06-21",
+        title: "Phase I – Term 1 Enrolment of Subjects",
+        category: "Academic",
+        detail: "Term 1 subject enrolment. The calendar specifies 20–21 June for this phase."
+    },
+    {
+        id: "reopen",
+        start: "2026-06-24",
+        end: "2026-06-24",
+        title: "Re-opening Date – 3rd, 5th and 7th Odd Semester",
+        category: "Academic",
+        detail: "Re-opening date for the 2026–2027 Odd Semester."
+    },
+    {
+        id: "muharram",
+        start: "2026-06-26",
+        end: "2026-06-26",
+        title: "Muharram",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "enrol2",
+        start: "2026-06-27",
+        end: "2026-06-28",
+        title: "Phase II – Term 1 Enrolment of Subjects",
+        category: "Academic",
+        detail: "Phase II subject enrolment."
+    },
+    {
+        id: "training",
+        start: "2026-06-22",
+        end: "2026-07-11",
+        title: "Internship / In-plant / Placement Training",
+        category: "Training",
+        detail: "The calendar lists internship, in-plant training, placement training and programming modules during this period. Final-year learners undergo placement training; eligible II and III year learners undergo internship/in-plant training."
+    },
+    {
+        id: "classes1",
+        start: "2026-07-13",
+        end: "2026-07-13",
+        title: "Commencement of Term 1 Classes",
+        category: "Academic",
+        detail: "For 3rd, 5th and 7th Odd Semester 2026–2027. The source also prints 16.07.2026, so confirm the official date with your college."
+    },
+    {
+        id: "cia1",
+        start: "2026-08-10",
+        end: "2026-08-15",
+        title: "Term 1 CIA 1 Exams",
+        category: "Exam",
+        detail: "Term 1 CIA–1 examination period."
+    },
+    {
+        id: "independence",
+        start: "2026-08-15",
+        end: "2026-08-15",
+        title: "Independence Day",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "orientation",
+        start: "2026-08-17",
+        end: "2026-08-22",
+        title: "First Year Inauguration and Orientation Program",
+        category: "Academic",
+        detail: "Shown in the first-year column."
+    },
+    {
+        id: "event1",
+        start: "2026-08-24",
+        end: "2026-08-29",
+        title: "Event Day 1",
+        category: "Event",
+        detail: "Event Day 1, shown in the first-year column."
+    },
+    {
+        id: "firstyear",
+        start: "2026-08-27",
+        end: "2026-08-27",
+        title: "Commencement of First Year Classes",
+        category: "Academic",
+        detail: "First-year Odd Semester classes; date printed in the source is 27.08.2026."
+    },
+    {
+        id: "milad",
+        start: "2026-08-26",
+        end: "2026-08-26",
+        title: "Milad-un-Nabi",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "drestein",
+        start: "2026-09-07",
+        end: "2026-09-12",
+        title: "Drestein ’26 – Week",
+        category: "Event",
+        detail: "Drestein ’26 week."
+    },
+    {
+        id: "cia2",
+        start: "2026-09-14",
+        end: "2026-09-19",
+        title: "Term 1 CIA 2 Exams",
+        category: "Exam",
+        detail: "Term 1 CIA–2 examination period."
+    },
+    {
+        id: "vinayagar",
+        start: "2026-09-14",
+        end: "2026-09-14",
+        title: "Vinayagar Chathurthi",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "lastwork1",
+        start: "2026-09-19",
+        end: "2026-09-19",
+        title: "Last Working Day – Term 1",
+        category: "Academic",
+        detail: "Last working day shown as 19 September 2026."
+    },
+    {
+        id: "final1",
+        start: "2026-09-21",
+        end: "2026-10-07",
+        title: "Term 1 Final Exams – Practical and Theory",
+        category: "Exam",
+        detail: "Final practical and theory exams, 21 September to 7 October 2026."
+    },
+    {
+        id: "mark1",
+        start: "2026-09-26",
+        end: "2026-09-26",
+        title: "Term 1 Mark Entry Deadline",
+        category: "Deadline",
+        detail: "Last date for entry of Term 1 CIA I and II and Model Lab marks. IAPR and Skill Assessment in CAMU are also listed."
+    },
+    {
+        id: "gandhi",
+        start: "2026-10-02",
+        end: "2026-10-02",
+        title: "Gandhi Jayanthi",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "term2",
+        start: "2026-10-05",
+        end: "2026-10-10",
+        title: "Commencement of Term 2 Theory Classes",
+        category: "Academic",
+        detail: "Term 2 theory classes. The source prints 08.10.2026."
+    },
+    {
+        id: "firstcia1",
+        start: "2026-10-12",
+        end: "2026-10-17",
+        title: "First Year CIA 1 Exams",
+        category: "Exam",
+        detail: "First-year CIA–1 examination period."
+    },
+    {
+        id: "ayudha",
+        start: "2026-10-19",
+        end: "2026-10-19",
+        title: "Ayudha Poojai",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "vijayadasami",
+        start: "2026-10-20",
+        end: "2026-10-20",
+        title: "Vijayadasami",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "markcia1",
+        start: "2026-10-24",
+        end: "2026-10-24",
+        title: "Last Date for Mark Entry – CIA I",
+        category: "Deadline",
+        detail: "First-year CIA–I mark-entry deadline."
+    },
+    {
+        id: "diwali",
+        start: "2026-11-07",
+        end: "2026-11-09",
+        title: "Diwali Holidays",
+        category: "Holiday",
+        detail: "The calendar lists Diwali holidays from 7 to 9 November."
+    },
+    {
+        id: "deepavali",
+        start: "2026-11-08",
+        end: "2026-11-08",
+        title: "Deepavali",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "cia21",
+        start: "2026-11-09",
+        end: "2026-11-14",
+        title: "Term 2 CIA 1 Exams",
+        category: "Exam",
+        detail: "Term 2 CIA–1 examination period."
+    },
+    {
+        id: "event2",
+        start: "2026-11-28",
+        end: "2026-11-28",
+        title: "Event Day 2",
+        category: "Event",
+        detail: "Event Day 2, shown on 28 November 2026."
+    },
+    {
+        id: "firstcia2",
+        start: "2026-12-07",
+        end: "2026-12-12",
+        title: "First Year CIA 2 Exams",
+        category: "Exam",
+        detail: "First-year CIA–2 exams. Last working day listed as 12 December 2026."
+    },
+    {
+        id: "cia22",
+        start: "2026-12-14",
+        end: "2026-12-19",
+        title: "Term 2 CIA 2 Exams",
+        category: "Exam",
+        detail: "Term 2 CIA–2 examination period. Last working day listed as 19 December 2026."
+    },
+    {
+        id: "firstfinal",
+        start: "2026-12-14",
+        end: "2027-01-08",
+        title: "First Year Final Exams – Practical and Theory",
+        category: "Exam",
+        detail: "First-year final examinations, 14 December 2026 to 8 January 2027."
+    },
+    {
+        id: "christmas",
+        start: "2026-12-25",
+        end: "2026-12-25",
+        title: "Christmas",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "final2",
+        start: "2026-12-21",
+        end: "2027-01-08",
+        title: "Term 2 Final Exams – Practical and Theory",
+        category: "Exam",
+        detail: "Term 2 final examinations, 21 December 2026 to 8 January 2027."
+    },
+    {
+        id: "newyear",
+        start: "2027-01-01",
+        end: "2027-01-01",
+        title: "New Year Day 2027",
+        category: "Holiday",
+        detail: "Holiday listed in the calendar remarks."
+    },
+    {
+        id: "mark2",
+        start: "2027-01-02",
+        end: "2027-01-02",
+        title: "Term 2 Mark Entry Deadline",
+        category: "Deadline",
+        detail: "Last date for Term 2 CIA I and II and Model Lab mark entry. IAPR and Skill Assessment in CAMU are also listed."
+    },
+    {
+        id: "pongalvizha",
+        start: "2027-01-09",
+        end: "2027-01-09",
+        title: "Pongal Vizha",
+        category: "Event",
+        detail: "Pongal Vizha, listed as Saturday."
+    },
+    {
+        id: "pongal",
+        start: "2027-01-11",
+        end: "2027-01-19",
+        title: "Pongal Holidays",
+        category: "Holiday",
+        detail: "Pongal holidays for all year groups."
+    },
+    {
+        id: "evenreopen",
+        start: "2027-01-20",
+        end: "2027-01-20",
+        title: "Tentative Reopening – Even Semester",
+        category: "Academic",
+        detail: "Tentative reopening for Even Semester (II, IV and VIII semesters), as stated in the uploaded calendar."
+    }
+];
+
+const monthNames = [
+    "January", "February", "March", "April",
+    "May", "June", "July", "August",
+    "September", "October", "November", "December"
+];
+
+const today = new Date();
+let viewYear = 2026;
+let viewMonth = 5;
+let selectedDate = "2026-06-24";
+
+function dateKey(date) {
+    return date.getFullYear() + "-" +
+        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+        String(date.getDate()).padStart(2, "0");
+}
+
+function parseDate(value) {
+    return new Date(value + "T12:00:00");
+}
+
+function formatDate(value) {
+    return parseDate(value).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function safeGetPins() {
+    try {
+        return JSON.parse(localStorage.getItem("activityCalendarPins")) || [];
+    } catch {
+        return [];
+    }
+}
+
+let pinned = safeGetPins();
+
+function savePins() {
+    localStorage.setItem("activityCalendarPins", JSON.stringify(pinned));
+}
+
+function escapeHTML(value) {
+    return value.replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+function eventsForDate(date) {
+    return events.filter(event =>
+        date >= event.start && date <= event.end
+    );
+}
+
+function monthEvents(year, month) {
+    const first = dateKey(new Date(year, month, 1));
+    const last = dateKey(new Date(year, month + 1, 0));
+
+    return events.filter(event =>
+        event.start <= last && event.end >= first
+    );
+}
+
+function setupMonthSelect() {
+    const select = document.getElementById("monthSelect");
+
+    for (let year = 2026; year <= 2027; year++) {
+        for (let month = 0; month < 12; month++) {
+            if (year === 2026 && month < 5) continue;
+            if (year === 2027 && month > 0) continue;
+
+            const option = document.createElement("option");
+            option.value = `${year}-${month}`;
+            option.textContent = `${monthNames[month]} ${year}`;
+            select.appendChild(option);
+        }
+    }
+}
+
+function renderCalendar() {
+    document.getElementById("monthTitle").textContent =
+        `${monthNames[viewMonth]} ${viewYear}`;
+
+    document.getElementById("monthSelect").value =
+        `${viewYear}-${viewMonth}`;
+
+    const grid = document.getElementById("daysGrid");
+    grid.innerHTML = "";
+
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const todayKey = dateKey(today);
+
+    for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "day empty";
+        grid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const key = dateKey(new Date(viewYear, viewMonth, day));
+        const dayEvents = eventsForDate(key);
+
+        const button = document.createElement("button");
+        button.className = "day";
+
+        if (key === todayKey) button.classList.add("today");
+        if (key === selectedDate) button.classList.add("selected");
+
+        const markers = dayEvents.slice(0, 2).map(event =>
+            `<span class="event-marker">${escapeHTML(event.title)}</span>`
+        ).join("");
+
+        const extra = dayEvents.length > 2
+            ? `<span class="event-marker">+${dayEvents.length - 2} more</span>`
+            : "";
+
+        const hasPin = dayEvents.some(event => pinned.includes(event.id));
+
+        button.innerHTML = `
+            <span class="day-number">${day}</span>
+            ${hasPin ? '<span class="star">★</span>' : ""}
+            ${markers}
+            ${extra}
+        `;
+
+        button.title = dayEvents.map(event => event.title).join("\n")
+            || "No scheduled event";
+
+        button.addEventListener("click", () => {
+            selectedDate = key;
+            renderCalendar();
+            renderSelectedDate();
+        });
+
+        grid.appendChild(button);
+    }
+
+    document.getElementById("monthCount").textContent =
+        monthEvents(viewYear, viewMonth).length;
+
+    document.getElementById("pinCount").textContent = pinned.length;
+
+    const upcoming = events
+        .filter(event => event.end >= dateKey(today))
+        .sort((a, b) => a.start.localeCompare(b.start))[0];
+
+    document.getElementById("nextEvent").textContent =
+        upcoming ? upcoming.title : "No upcoming events";
+
+    document.getElementById("nextDate").textContent =
+        upcoming ? formatDate(upcoming.start) : "";
+
+    renderPinned();
+    renderSelectedDate();
+}
+
+function renderSelectedDate() {
+    document.getElementById("selectedDate").textContent =
+        formatDate(selectedDate);
+
+    const container = document.getElementById("eventList");
+    container.innerHTML = "";
+
+    const dayEvents = eventsForDate(selectedDate);
+
+    if (dayEvents.length === 0) {
+        container.innerHTML =
+            '<div class="empty-note">No event is listed for this date.</div>';
+        return;
+    }
+
+    dayEvents.forEach(event => {
+        const isPinned = pinned.includes(event.id);
+        const item = document.createElement("div");
+
+        item.className = "event-item";
+
+        item.innerHTML = `
+            <h3>${escapeHTML(event.title)}</h3>
+            <p>${escapeHTML(event.detail)}</p>
+            <span class="event-date">
+                ${escapeHTML(event.category)} · ${formatDate(event.start)}
+                ${event.end !== event.start ? " – " + formatDate(event.end) : ""}
+            </span>
+            <br>
+            <button class="pin-button">
+                ${isPinned ? "★ Unpin Event" : "☆ Pin Event"}
+            </button>
+        `;
+
+        item.querySelector("button").addEventListener("click", () => {
+            togglePin(event.id);
+        });
+
+        container.appendChild(item);
+    });
+}
+
+function renderPinned() {
+    const container = document.getElementById("pinnedList");
+    container.innerHTML = "";
+
+    const pinnedEvents = events.filter(event =>
+        pinned.includes(event.id)
+    );
+
+    if (pinnedEvents.length === 0) {
+        container.innerHTML =
+            '<div class="empty-note">No pinned events yet. Select a date and pin an event.</div>';
+        return;
+    }
+
+    pinnedEvents.forEach(event => {
+        const item = document.createElement("div");
+        item.className = "pinned-item";
+
+        item.innerHTML = `
+            <span>
+                <strong>★ ${escapeHTML(event.title)}</strong><br>
+                <small>${formatDate(event.start)}</small>
+            </span>
+            <button>View</button>
+        `;
+
+        item.querySelector("button").addEventListener("click", () => {
+            selectedDate = event.start;
+            viewYear = parseDate(event.start).getFullYear();
+            viewMonth = parseDate(event.start).getMonth();
+            renderCalendar();
+        });
+
+        container.appendChild(item);
+    });
+}
+
+function togglePin(id) {
+    if (pinned.includes(id)) {
+        pinned = pinned.filter(item => item !== id);
+    } else {
+        pinned.push(id);
+    }
+
+    savePins();
+    renderCalendar();
+}
+
+function changeMonth(amount) {
+    const next = new Date(viewYear, viewMonth + amount, 1);
+
+    if (next < new Date(2026, 5, 1)) return;
+    if (next > new Date(2027, 1, 1)) return;
+
+    viewYear = next.getFullYear();
+    viewMonth = next.getMonth();
+    renderCalendar();
+}
+
+/* Live date and time */
+function updateDateTime() {
+    const now = new Date();
+
+    document.getElementById("liveDay").textContent =
+        now.toLocaleDateString("en-IN", {
+            weekday: "long"
+        });
+
+    document.getElementById("liveDate").textContent =
+        now.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+    document.getElementById("liveTime").textContent =
+        now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        }).toLowerCase();
+}
+
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+document.getElementById("prevBtn").addEventListener("click", () => {
+    changeMonth(-1);
+});
+
+document.getElementById("nextBtn").addEventListener("click", () => {
+    changeMonth(1);
+});
+
+document.getElementById("monthSelect").addEventListener("change", event => {
+    const [year, month] = event.target.value.split("-").map(Number);
+    viewYear = year;
+    viewMonth = month;
+    renderCalendar();
+});
+
+document.getElementById("todayBtn").addEventListener("click", () => {
+    if (today >= new Date(2026, 5, 1) &&
+        today <= new Date(2027, 1, 28)) {
+        viewYear = today.getFullYear();
+        viewMonth = today.getMonth();
+        selectedDate = dateKey(today);
+    } else {
+        viewYear = 2026;
+        viewMonth = 5;
+        selectedDate = "2026-06-24";
+    }
+
+    renderCalendar();
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+    if (history.length > 1) {
+        history.back();
+    } else {
+        window.location.href = "dashboard.html";
+    }
+});
+
+setupMonthSelect();
+renderCalendar();
+</script>
+
+</body>
+</html>

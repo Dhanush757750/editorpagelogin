@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Schedules</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(120deg, #667eea, #764ba2);
+    background-size: 180% 180%;
+    animation: gradientMove 9s ease infinite;
+}
+
+@keyframes gradientMove {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Added: Live date and time */
+.datetime-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 220px;
+    padding: 13px 17px;
+    color: white;
+    text-align: right;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.datetime-day {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.datetime-date {
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.datetime-time {
+    margin-top: 7px;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.container {
+    width: 760px;
+    max-width: 100%;
+    padding: 28px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 18px 35px rgba(0,0,0,.22);
+    animation: appear .6s ease;
+    transition: transform .3s, box-shadow .3s;
+}
+
+.container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 23px 42px rgba(0,0,0,.25);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+h1 {
+    color: #4f46e5;
+    font-size: 26px;
+}
+
+.subtitle {
+    margin-top: 7px;
+    color: #778196;
+    font-size: 14px;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: transform .2s, box-shadow .2s, background .2s;
+}
+
+.today, .back {
+    padding: 11px 16px;
+    color: white;
+    background: linear-gradient(120deg, #5146ed, #764ba2);
+    background-size: 160% 160%;
+}
+
+.today:hover, .back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 17px rgba(81,70,237,.28);
+    background-position: 100% 50%;
+}
+
+button:active {
+    transform: scale(.97);
+}
+
+.days {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 3px 2px 14px;
+}
+
+.days button {
+    flex: 1 0 52px;
+    padding: 11px 8px;
+    color: #5146ed;
+    background: #f7f6ff;
+    border: 1px solid #e4e2ff;
+}
+
+.days button:hover {
+    background: #e9e7ff;
+    transform: translateY(-2px);
+}
+
+.days button.active {
+    color: white;
+    background: linear-gradient(120deg, #5146ed, #764ba2);
+    border-color: transparent;
+    box-shadow: 0 5px 12px rgba(81,70,237,.22);
+}
+
+#scheduleList {
+    margin-top: 8px;
+}
+
+.class-item {
+    display: grid;
+    grid-template-columns: 135px 5px minmax(0,1fr);
+    gap: 13px;
+    margin-bottom: 14px;
+    animation: appear .3s ease;
+}
+
+.time {
+    padding-top: 15px;
+    color: #727b91;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.line {
+    border-radius: 5px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+}
+
+.class-info {
+    padding: 15px;
+    border-radius: 10px;
+    background: #f1f0ff;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.class-info:hover {
+    transform: translateX(3px);
+    box-shadow: 0 5px 14px rgba(79,70,229,.1);
+}
+
+.class-info h3 {
+    color: #30334b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.class-info p {
+    color: #737d91;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+.class-info.purple { background: #f6f0ff; }
+.class-info.green { background: #eaf8f1; }
+.class-info.orange { background: #fff3e8; }
+
+.attendance {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 11px;
+    font-size: 12px;
+    color: #5146ed;
+    cursor: pointer;
+}
+
+.attendance input {
+    accent-color: #5146ed;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.empty {
+    padding: 25px 10px;
+    text-align: center;
+    color: #778196;
+    background: #f7f6ff;
+    border-radius: 10px;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #eee;
+}
+
+.summary {
+    color: #778196;
+    font-size: 13px;
+}
+
+.summary strong {
+    color: #5146ed;
+}
+
+@media(max-width:600px) {
+    body { padding: 12px; align-items: flex-start; }
+
+    /* Added: Responsive date and time panel */
+    .datetime-box {
+        top: 10px;
+        right: 10px;
+        min-width: 175px;
+        padding: 9px 12px;
+    }
+
+    .datetime-day { font-size: 11px; }
+    .datetime-date { font-size: 10px; }
+    .datetime-time { font-size: 17px; }
+
+    .container {
+        margin-top: 115px;
+        padding: 20px 15px;
+    }
+
+    h1 { font-size: 22px; }
+
+    .class-item {
+        grid-template-columns: 90px 4px minmax(0,1fr);
+        gap: 9px;
+    }
+
+    .time { font-size: 11px; }
+
+    .class-info { padding: 12px 10px; }
+
+    .class-info h3 { font-size: 13px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Added: Date and time panel -->
+<div class="datetime-box">
+    <div class="datetime-day" id="liveDay"></div>
+    <div class="datetime-date" id="liveDate"></div>
+    <div class="datetime-time" id="liveTime"></div>
+</div>
+
+<main class="container">
+
+    <div class="header">
+        <div>
+            <h1>Class Schedules</h1>
+            <p class="subtitle">View your weekly classes and track attendance.</p>
+        </div>
+        <button class="today" id="todayBtn">Today</button>
+    </div>
+
+    <div class="days" id="days">
+        <button data-day="Mon">Mon</button>
+        <button data-day="Tue">Tue</button>
+        <button data-day="Wed">Wed</button>
+        <button data-day="Thu">Thu</button>
+        <button data-day="Fri">Fri</button>
+        <button data-day="Sat">Sat</button>
+        <button data-day="Sun">Sun</button>
+    </div>
+
+    <section id="scheduleList"></section>
+
+    <div class="footer">
+        <p class="summary" id="summary"></p>
+        <button class="back" id="backBtn">← Back</button>
+    </div>
+
+</main>
+
+<script>
+const schedules = {
+    Mon: [
+        ["09:45 AM - 11:14 AM", "19AI305 – Advanced C Programming"],
+        ["11:30 AM - 12:14 PM", "ECA-SCOFT-M – SCOFT Mentor Meet"],
+        ["01:15 PM - 02:44 PM", "19CS404 – Database Management System and its Applications"],
+        ["03:00 PM - 04:29 PM", "C19GE624 – Japanese Language N5 Basic"],
+        ["05:00 PM - 06:29 PM", "Break"],
+        ["06:29 PM - 07:49 PM", "🎥"],
+        ["08:30 PM - 02:49 PM", "🎥"]
+    ],
+    Tue: [
+        ["08:00 AM - 09:29 AM", "19AI405 – Fundamentals of Artificial Intelligence"],
+        ["11:30 AM - 12:14 PM", "ECA-SCOFT-M – SCOFT Mentor Meet"],
+        ["01:15 PM - 02:44 PM", "19AI305 – Advanced C Programming"],
+        ["03:00 PM - 04:29 PM", "Break"],
+        ["05:00 PM - 07:49 PM", "🎥"],
+        ["08:30 PM - 02:49 PM", "🎥"]
+    ],
+    Wed: [
+        ["08:00 AM - 09:29 AM", "19CS404 – Database Management System and its Applications"],
+        ["09:45 AM - 11:14 AM", "19GE624 – Japanese Language N5 Basic"],
+        ["11:30 AM - 12:14 PM", "ECA-SCOFT-M – SCOFT Mentor Meet"],
+        ["01:15 PM - 02:44 PM", "19AI305 – Advanced C Programming"],
+        ["03:00 PM - 04:29 PM", "Break"],
+        ["05:00 PM - 07:49 PM", "🎥"],
+        ["08:30 PM - 03:49 PM", "🎥"]
+    ],
+    Thu: [
+        ["09:45 AM - 11:14 AM", "19AI413 – Deep Learning and its Applications"],
+        ["01:15 PM - 02:44 PM", "19CS404 – Database Management System and its Applications"],
+        ["03:00 PM - 04:29 PM", "19AI405 – Fundamentals of Artificial Intelligence"],
+        ["05:00 PM - 07:49 PM", "🎥"],
+        ["08:30 PM - 02:49 PM", "🎥"]
+    ],
+    Fri: [
+        ["08:00 AM - 09:29 AM", "19CS404 – Database Management System and its Applications"],
+        ["09:45 AM - 11:14 AM", "19AI413 – Deep Learning and its Applications"],
+        ["12:15 PM - 12:59 PM", "ECA-SCOFT-M – SCOFT Mentor Meet"],
+        ["01:15 PM - 02:44 PM", "19AI305 – Advanced C Programming"],
+        ["03:00 PM - 04:29 PM", "19AI405 – Fundamentals of Artificial Intelligence"],
+        ["05:00 PM - 07:49 PM", "🎥"],
+        ["08:30 PM - 03:49 PM", "🎥"]
+    ],
+    Sat: [
+        ["09:45 AM - 11:14 AM", "19AI405 – Fundamentals of Artificial Intelligence"],
+        ["12:15 PM - 12:59 PM", "ECA-SCOFT-M – SCOFT Mentor Meet"],
+        ["04:29 PM - 07:49 PM", "🎥"],
+        ["08:30 PM - 02:49 PM", "🎥"]
+        
+    ],
+    Sun: [
+        ["09:29 PM - 11:29 PM", "🎥"],
+        ["12:00 PM - 04:29 PM", "🎥"],
+        ["04:29 PM - 07:49 PM", "🎥"],
+        ["08:30 PM - 02:49 PM", "🎥"]
+    ]
+};
+
+const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const attendanceKey = "classScheduleAttendance";
+let selectedDay = dayNames[new Date().getDay()];
+let attendance = {};
+
+try {
+    attendance = JSON.parse(localStorage.getItem(attendanceKey) || "{}");
+} catch (e) {}
+
+function renderSchedule(day) {
+    selectedDay = day;
+
+    document.querySelectorAll("#days button").forEach(btn => {
+        const active = btn.dataset.day === day;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", String(active));
+    });
+
+    const list = document.getElementById("scheduleList");
+    list.innerHTML = "";
+    const classes = schedules[day] || [];
+
+    if (classes.length === 0) {
+        list.innerHTML = '<div class="empty">No classes scheduled for this day.</div>';
+    } else {
+        classes.forEach((item, index) => {
+            const key = day + "-" + index;
+            const wrapper = document.createElement("article");
+            wrapper.className = "class-item";
+
+            const time = document.createElement("div");
+            time.className = "time";
+            time.textContent = item[0];
+
+            const line = document.createElement("div");
+            line.className = "line";
+
+            const info = document.createElement("div");
+            const color = ["", "purple", "green", "orange"][index % 4];
+            info.className = "class-info " + color;
+
+            const title = document.createElement("h3");
+            title.textContent = item[1];
+
+            const note = document.createElement("p");
+            note.textContent = "Scheduled class";
+
+            const label = document.createElement("label");
+            label.className = "attendance";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = attendance[key] === true;
+
+            checkbox.addEventListener("change", () => {
+                attendance[key] = checkbox.checked;
+                try {
+                    localStorage.setItem(attendanceKey, JSON.stringify(attendance));
+                } catch (e) {}
+                updateSummary();
+            });
+
+            label.append(checkbox, document.createTextNode("Mark attendance"));
+            info.append(title, note, label);
+            wrapper.append(time, line, info);
+            list.appendChild(wrapper);
+        });
+    }
+
+    updateSummary();
+}
+
+function updateSummary() {
+    const classes = schedules[selectedDay] || [];
+    const attended = classes.filter((item, index) =>
+        attendance[selectedDay + "-" + index] === true
+    ).length;
+
+    document.getElementById("summary").innerHTML =
+        'Classes scheduled: <strong>' + classes.length +
+        '</strong> · Attended: <strong>' + attended + '</strong>';
+}
+
+document.querySelectorAll("#days button").forEach(btn => {
+    btn.addEventListener("click", () => renderSchedule(btn.dataset.day));
+});
+
+document.getElementById("todayBtn").addEventListener("click", () => {
+    renderSchedule(dayNames[new Date().getDay()]);
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+    if (history.length > 1) history.back();
+    else window.location.href = "index.html";
+});
+
+/* Added: Update the live date and time every second */
+function updateDateTime() {
+    const now = new Date();
+
+    document.getElementById("liveDay").textContent =
+        now.toLocaleDateString("en-IN", {
+            weekday: "long"
+        });
+
+    document.getElementById("liveDate").textContent =
+        now.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        });
+
+    document.getElementById("liveTime").textContent =
+        now.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        });
+}
+
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+renderSchedule(selectedDay);
+</script>
+</body>
+</html>
